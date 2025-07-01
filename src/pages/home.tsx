@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { Grid, Typography, Paper } from '@mui/material';
 
 export default function CameraPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -9,7 +10,9 @@ export default function CameraPage() {
     const initCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true, // <--- permite qualquer câmera (frontal ou traseira)
+          video: {
+            facingMode: { exact: 'environment' }, // força câmera traseira
+          },
           audio: false,
         });
 
@@ -18,7 +21,7 @@ export default function CameraPage() {
         }
       } catch (error) {
         console.error('Erro ao acessar câmera:', error);
-        alert('Erro ao acessar a câmera. Veja o console.');
+        alert('Erro ao acessar a câmera traseira. Verifique as permissões ou o suporte do navegador.');
       }
     };
 
@@ -32,21 +35,41 @@ export default function CameraPage() {
   }, []);
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2>Câmera (genérica)</h2>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        style={{
-          width: '100%',
-          maxWidth: 600,
-          border: '2px solid #ff5c00',
-          borderRadius: 10,
-          background: '#000',
-        }}
-      />
-    </div>
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ minHeight: '100vh', padding: '1rem' }}
+    >
+      <Grid>
+        <Typography variant="h5" color="secondary" align="center" gutterBottom>
+          Visualização da Câmera Traseira
+        </Typography>
+
+        <Paper
+          elevation={4}
+          sx={{
+            overflow: 'hidden',
+            borderRadius: 3,
+            border: '2px solid',
+            borderColor: 'secondary.main',
+            backgroundColor: '#000',
+          }}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            style={{
+              width: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              display: 'block',
+            }}
+          />
+        </Paper>
+      </Grid>
+    </Grid>
   );
 }
